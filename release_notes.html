@@ -1,0 +1,113 @@
+
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <title>Release Notes</title>
+    <style type="text/css" media="all">
+      @import url("./css/maven-base.css");
+      @import url("./css/maven-theme.css");
+      @import url("./css/site.css");
+    </style>
+    <link rel="stylesheet" href="./css/print.css" type="text/css" media="print" />
+          <meta name="author" content="Tim O'Brien" />
+        <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+  </head>
+  <body class="composite">
+    <div id="banner">
+                          <a href="http://www.discursive.com/projects/cas-extend/" id="bannerLeft">
+    
+                                    <img src="http://www.discursive.com/projects/cas-extend/images/cas-banner.png" alt="" />
+    
+            </a>
+                    <div class="clear">
+        <hr/>
+      </div>
+    </div>
+    <div id="breadcrumbs">
+      <div class="xleft">Last Published: Sun Apr 30 13:41:08 CDT 2006</div>
+      <div class="xright">  </div>
+      <div class="clear">
+        <hr/>
+      </div>
+    </div>
+    <div id="leftColumn"><div id="navcolumn">      <h5>Extended CAS</h5>
+    <ul>
+              
+    <li class="none">
+          <a href="index.html">Introduction</a>
+        </li>
+              
+    <li class="none">
+          <a href="configure.html">Configuration</a>
+        </li>
+              
+    <li class="none">
+          <a href="download.html">Download</a>
+        </li>
+              
+    <li class="none">
+          <strong><a href="release_notes.html">Release Notes</a></strong>
+        </li>
+          </ul>
+      <h5>Using CAS: HOW-TO</h5>
+    <ul>
+              
+    <li class="none">
+          <a href="tomcat_jndi.html">Config via JNDI</a>
+        </li>
+              
+    <li class="none">
+          <a href="dummy_trust.html">Dummy Trust</a>
+        </li>
+              
+    <li class="none">
+          <a href="multiple_hostname.html">Multiple Host Names</a>
+        </li>
+          </ul>
+      <h5>Project Collaboration</h5>
+    <ul>
+              
+    <li class="none">
+          <a href="google_group.html">Google Group</a>
+        </li>
+              
+    <li class="none">
+          <a href="source-repository.html">Source Code (SVN)</a>
+        </li>
+              
+    <li class="none">
+          <a href="team-list.html">Develoment Team</a>
+        </li>
+              
+    <li class="none">
+          <a href="license.html">License</a>
+        </li>
+          </ul>
+  <a href="http://maven.apache.org/" title="Built by Maven" id="poweredBy">
+              <img alt="Built by Maven" src="./images/logos/maven-feather.png"></img>
+            </a>
+    </div></div>
+    <div id="bodyColumn">
+      <div id="contentBox">
+        <div class="section"><h2>Release Notes</h2><div class="section"><h3>Release 2.2 - (April 30, 2006)</h3><p>This release adds a single parameter that is required to support application servers that are behind other servers responsible for SSL. There are situations when a servlet container is neither resposible for SSL, nor is it aware that a request is secure because the SSL has been off-loaded to a load balancer or a web-server that is not passing on SSL information to the servlet container. In these sutations, even though a request for a protected service may have been made with an https scheme, the CAS Filter does not know that and it crafts a serviceURL with an http scheme. With this property you can force the server to use a certain scheme.</p><ul><li>Added serviceScheme parameter, forces the scheme of the service URL when CAS filter computes serviceUrl off of casServerName. For more information, see <a href="configure.html">the configuration documentation</a>.</li></ul></div><div class="section"><h3>Release 2.1.1 - (late February 2006)</h3><p>This is the initial fork of the Yale CAS Client codebase. In this release, we've added support for a number of options that go above and beyond the initial feature set. Please see the documentation for this filter, it is not secure by design, and allows you to make informed decisions regarding the security level of a particular installation. Before using dummy trust or multiple hostnames, you should know that they may introduce serious security vulnerabilities if you are not carefully considering the security environment they are deployed in.</p><ul><li>Added support for <a href="dummy_trust.html">Configurable Trust for Programmatic SSL</a>. Please see documentation for security caveats.</li><li>Added Support for <a href="multiple_hostname.html">Multiple Server Names</a>. Please see documentation for security caveats.</li><li>Added <a href="tomcat_jndi.html">Ability to Configure CASFilter via JNDI</a>.</li></ul></div></div>
+      </div>
+    </div>
+    <div class="clear">
+      <hr/>
+    </div>
+    <div id="footer">
+      <div class="xright">&#169;  
+          2006
+    
+      </div>
+      <div class="clear">
+        <hr/>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,140 @@
+
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <title>Configuring CAS Filter via Tomcat JNDI</title>
+    <style type="text/css" media="all">
+      @import url("./css/maven-base.css");
+      @import url("./css/maven-theme.css");
+      @import url("./css/site.css");
+    </style>
+    <link rel="stylesheet" href="./css/print.css" type="text/css" media="print" />
+        <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+  </head>
+  <body class="composite">
+    <div id="banner">
+                          <a href="http://www.discursive.com/projects/cas-extend/" id="bannerLeft">
+    
+                                    <img src="http://www.discursive.com/projects/cas-extend/images/cas-banner.png" alt="" />
+    
+            </a>
+                    <div class="clear">
+        <hr/>
+      </div>
+    </div>
+    <div id="breadcrumbs">
+      <div class="xleft">Last Published: Sun Apr 30 13:41:08 CDT 2006</div>
+      <div class="xright">  </div>
+      <div class="clear">
+        <hr/>
+      </div>
+    </div>
+    <div id="leftColumn"><div id="navcolumn">      <h5>Extended CAS</h5>
+    <ul>
+              
+    <li class="none">
+          <a href="index.html">Introduction</a>
+        </li>
+              
+    <li class="none">
+          <a href="configure.html">Configuration</a>
+        </li>
+              
+    <li class="none">
+          <a href="download.html">Download</a>
+        </li>
+              
+    <li class="none">
+          <a href="release_notes.html">Release Notes</a>
+        </li>
+          </ul>
+      <h5>Using CAS: HOW-TO</h5>
+    <ul>
+              
+    <li class="none">
+          <strong><a href="tomcat_jndi.html">Config via JNDI</a></strong>
+        </li>
+              
+    <li class="none">
+          <a href="dummy_trust.html">Dummy Trust</a>
+        </li>
+              
+    <li class="none">
+          <a href="multiple_hostname.html">Multiple Host Names</a>
+        </li>
+          </ul>
+      <h5>Project Collaboration</h5>
+    <ul>
+              
+    <li class="none">
+          <a href="google_group.html">Google Group</a>
+        </li>
+              
+    <li class="none">
+          <a href="source-repository.html">Source Code (SVN)</a>
+        </li>
+              
+    <li class="none">
+          <a href="team-list.html">Develoment Team</a>
+        </li>
+              
+    <li class="none">
+          <a href="license.html">License</a>
+        </li>
+          </ul>
+  <a href="http://maven.apache.org/" title="Built by Maven" id="poweredBy">
+              <img alt="Built by Maven" src="./images/logos/maven-feather.png"></img>
+            </a>
+    </div></div>
+    <div id="bodyColumn">
+      <div id="contentBox">
+        <div class="section"><h2>Filter Configuration via JNDI</h2><p>Configuring the Extended CAS filter using JNDI has distinct advantages over configuring the CAS Filter through Servlet Filter initialization parameters. Since CAS configuration includes references to external resources that could potentially change depending on the environment an application is running on, configuring your container and not your application will make it easier to promote your web application to different operating environments. This document describes the process for configuring the Extended CASFilter using a Global JNDI resource in Tomcat. While this process may seem somewhat involved at first glance, it uses the same basic maechanism that is used to configure a container-managed JDBC DataSource. Following the steps covered in this document will help you deploy a system that can be more easily adapted to change.</p><div class="section"><h3>Why JNDI Configuration?</h3><p>One common implementation strategy for web applications involves the placement of a configuration variable in a <i>i</i>web.xml&gt; file or properties file. For example, if you are developing an application that retrieves information from a database, you might place your JDBC Driver name, database user name and password in a properties file in WEB-INF, and have a Servlet read this file directly when it needs to create a JDBC connection. Another alternative would be to use your servlet container's JNDI facilities to obtain a JDBC connection from a JDBC DataSource bound to a known location on in JNDI. When you are deploying your application in different environments, the JNDI approach has distinct advantages. </p><p>When you place a configuration parameter in your web application directly (when a configuration point is bundled into a WAR), the only way to redeploy that application to a different environment is to alter the property directly. For example, if you usually test your application on localhost and read from a database that also resides on localhost, they only way to &quot;create a WAR&quot; for production is to change this configuration manually when you are building a WAR file that is destined for your production environment. An alternative would be to add some search and replace logic into your project's build. If you use a build tool like Ant, you could just write search and replace logic to replace variables at build time; in your database configuration in WEB-INF/jdbc.properties you would just store a variable like %JDBC_DRIVER_NAME%, and when you needed to build a war for production you would replace that with a set of values stored in a dictionary.</p><p>In the JNDI managed alternative, your application (you WAR file) doesn't contain any configuration points directly. It contains references to container managed resources. Instead of pointing directly at a database on &quot;localhost&quot;, your web application retrieves a DataSource from the container and retrieves a JDBC Connection. You provide concrete configuration points to the container, which in turn binds a resource to a known location for your application. It is this layer of indirection that does away with the need to &quot;create a WAR for production&quot;. You can test a WAR on your local machine, and then copy it to another servlet container which has been configured to hit a different set of resources. Configuration via JNDI resources add some complexity to your setup, but this indirection frees you from having to worry about running special builds that cater to different environments.</p><p>With JNDI managed resources, configuration and application become well separated - orthogonal.</p></div><div class="section"><h3>JNDI Configuration and the Extended CAS Filter</h3><p>The CASFilter is a perfect candidate for configuration via JNDI. The CASFilter expects a login URL and a validation URL that point to a CAS Server. These are configuration points which will undoubtedly change between development environments and production environments. Let's take a look at two configuration scenarios for the CASFilter: one in a development environment and one in a production environment.</p><div class="section"><h4>Development Environment</h4><img src="images/jndi-dev-scenario.png" alt="Development Environment Scenario" /><p>This is the most familiar scenario to a developer. You might be running Tomcat locally (possibly from an IDE like Eclipse), and chances are you've configured both CAS and your application to run in the same servlet container on HTTPS 8443. The configuration for CAS is straightfoward, and if you follow the established convention of putting your configuration in your <i>web.xml</i> as servelt filter initialization parameters, you will be able to develop profitably. Now let's assume that your operations team has decided to implement Tomcat clusering to achieve a higher level of reliability. Take a look at an example of a fairly straightfoward production network environment:</p></div><div class="section"><h4>Production Environment</h4><img src="images/jndi-prod-scenario.png" alt="Production Environment Scenario" /><p>Your application is going to be deployed to a cluster of servlet containers and the CAS servers are going to be served by another cluster of servlet containers. Even request from a user is routed through a pair of load balanced web servers. In this environment, you'll need to pass a public login URL to redirect a browser to a path that will hit the CAS cluster. Let's assume that URL is something like <i>https://www.someorg.org/cas/login.html</i>. To reduce latency, let's assume that you want your authentication URL to be routed through a separate network, you might have machines with dual NICs, so having an authentication URL of <i>http://10.1.1.2/cas/authentication.html</i> might perform the authentication over a much faster, isolated network reserved for clustering and server-server communcations. Let's further complicate matters and say that every different machine in the application server cluster needs to hit a different authentication URL that works with a load balancer internal to the network. In other words, when you launch to production, your configuration is not only going to be different from development, it is going to be specific to each application server instance.</p></div><div class="section"><h4>CAS Configuration Alternatives</h4><p>You could keep configuration in your WAR file and just shift the problem to your operations team. You'll send them a WAR file, they will unpack it and modify any variables that need to be modified in <i>web.xml</i>. Then they will deploy the application and test accordingly. But, there is a problem with this approach, Java programming isn't a primary resposiblity of your operations staff, they are more focused on making sure that your machines are operating smoothly, and they care more about RAID, Nagios, Cacti, kernel updates, etc. Like most people skilled in Operations, they understand configuring servers like Apache HTTPD and MySQL, but asking them to wait around for an application launch so that they can change some variables in a <i>web.xml</i> worries them and you. It took enough work to get your systems administrators to the point where they understand that <i>$<a name="catalina.home">catalina.home</a>/conf/server.xml</i> contains all of the configuration points for Tomcat, now you are asking them to wade through your <i>web.xml</i>.</p><p>Another alternative is to write a series of scripts to post-process a WAR for a particular environment, drop the WAR in a directory, run a script, and supply the right parameters and it will take care of configuring your WAR file for development or production. In this was you could integrate configuration into your build environment. But, why go to all the trouble when there is a mechanism to separate configuration from the application. Bite the bullet and use a global JNDI resource at the container level. The extra 10 minutes it might take you to set this up will far outweigh the effort it will take to continuously support your decision to place configuration into your web application. </p></div></div></div><div class="section"><h2>Configuring Extended CASFilter via JNDI</h2><p>Now that you are convinced configuration by JNDI is worth it, here's a simple set of instructions. Follow this script, and you'll be able to configuration CASFilter via a global resource in Jakarta Tomcat. The following should also be possible in any servlet container that provides JNDI resources, but for simplicity, this document focuses on Jakarta Tomcat 5.</p><div class="section"><h3>The Script</h3><div class="section"><h4>Step 1: Add CAS Filter to common/lib</h4><p>Place the CAS filter JAR in <i>$<a name="catalina.home">catalina.home</a>/common/lib</i>. This will make the CASConfig class available to the servlet container on container startup when it is initializing global resources. </p><p><b>Note:</b> If you are concerned that you'll be putting the Extended CAS filter jar in common/lib and in your application you have no need to worry. The Extended CAS filter takes care of the class incompatiblity issue by copying properties from one instance of CASConfig to an instance of the class loaded from a web application's Classloader.</p></div><div class="section"><h4>Step 2: Add a Global Naming Resource</h4><p>The following element should be added to <i>$<a name="catalina.home">catalina.home</a>/conf/server.xml</i> within the &amp;lt;GlobalNamingResources&amp;gt; element.</p><div class="source"><pre>&lt;Resource name=&quot;security/CASConfig&quot;
+          type=&quot;com.discursive.cas.extend.client.CASConfig&quot;
+          factory=&quot;org.apache.naming.factory.BeanFactory&quot;
+          casLogin=&quot;https://localhost:8443/cas/login&quot;
+          casValidate=&quot;https://localhost:8443/cas/serviceValidate&quot;
+          serverName=&quot;localhost&quot;
+          dummyTrust=&quot;true&quot;/&gt;</pre></div><p>This Resource element creates an instance of CASConfig and binds it to &quot;security/CASConfig&quot;. You are making use of the BeanFactory which simply creates an instance of a Java bean, populating the bean properties with the attributes supplied to the Resource element in <i>server.xml</i>. If you examine the CASConfig class itself, you will see that it contains get/set methods for each property: dummyTrust, casValidate, casLogin, etc.</p></div><div class="section"><h4>Step 3: Add a context.xml file to docRoot/META-INF</h4><p>In order for your web application to access a global naming resource, you will need to create a Tomcat-specific context configuration file. You can add this to your web application by creating a directory named &quot;META-INF&quot; off of your web application's doc root. In the end, you should have a directory named META-INF under your document with the file META-INF/context.xml. The contents of this file should be as follows:</p><div class="source"><pre>&lt;Context path=&quot;/admin&quot; reloadable=&quot;true&quot; 
+         docBase=&quot;${catalina.home}/webapps/admin&quot; &gt;
+    &lt;!-- you might have other resource links --&gt;
+    &lt;ResourceLink name=&quot;security/CASConfig&quot; 
+                  global=&quot;security/CASConfig&quot; 
+                  type=&quot;com.discursive.cas.extend.client.CASConfig&quot;/&gt;
+&lt;/Context&gt;</pre></div><p>This context configuration simply exposes the global component bound to security/CASConfig to your web application.</p></div><div class="section"><h4>Step 4: Add the filter mapping to web.xml</h4><p>Lastly, add the filter mapping to web.xml. Instead of supplying all of the regular CAS Filter properties, you will only supply one parameter &quot;com.discursive.cas.extend.client.config.jndi&quot;. This will instruct the CASFilter to obtain an instance of CASConfig from this JNDI location.</p><p>The following filter is added to your <i>WEB-INF/web.xml</i>:</p><div class="source"><pre>&lt;filter&gt;
+  &lt;filter-name&gt;CAS Filter&lt;/filter-name&gt;
+  &lt;filter-class&gt;
+    com.discursive.cas.extend.client.filter.CASFilter
+  &lt;/filter-class&gt;
+  &lt;init-param&gt;
+    &lt;param-name&gt;
+      com.discursive.cas.extend.client.config.jndi
+    &lt;/param-name&gt;
+    &lt;param-value&gt;security/CASConfig&lt;/param-value&gt;
+  &lt;/init-param&gt;
+&lt;/filter&gt;
+
+&lt;filter-mapping&gt;
+  &lt;filter-name&gt;CAS Filter&lt;/filter-name&gt;
+  &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+&lt;/filter-mapping&gt;</pre></div><div class="source"><pre>  Contributors:  Tim O'Brien (3/06)</pre></div></div></div></div>
+      </div>
+    </div>
+    <div class="clear">
+      <hr/>
+    </div>
+    <div id="footer">
+      <div class="xright">&#169;  
+          2006
+    
+      </div>
+      <div class="clear">
+        <hr/>
+      </div>
+    </div>
+  </body>
+</html>

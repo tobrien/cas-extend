@@ -1,0 +1,115 @@
+
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <title>Extended CAS Client</title>
+    <style type="text/css" media="all">
+      @import url("./css/maven-base.css");
+      @import url("./css/maven-theme.css");
+      @import url("./css/site.css");
+    </style>
+    <link rel="stylesheet" href="./css/print.css" type="text/css" media="print" />
+          <meta name="author" content="Tim O'Brien" />
+        <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+  </head>
+  <body class="composite">
+    <div id="banner">
+                          <a href="http://www.discursive.com/projects/cas-extend/" id="bannerLeft">
+    
+                                    <img src="http://www.discursive.com/projects/cas-extend/images/cas-banner.png" alt="" />
+    
+            </a>
+                    <div class="clear">
+        <hr/>
+      </div>
+    </div>
+    <div id="breadcrumbs">
+      <div class="xleft">Last Published: Sun Apr 30 13:41:08 CDT 2006</div>
+      <div class="xright">  </div>
+      <div class="clear">
+        <hr/>
+      </div>
+    </div>
+    <div id="leftColumn"><div id="navcolumn">      <h5>Extended CAS</h5>
+    <ul>
+              
+    <li class="none">
+          <strong><a href="index.html">Introduction</a></strong>
+        </li>
+              
+    <li class="none">
+          <a href="configure.html">Configuration</a>
+        </li>
+              
+    <li class="none">
+          <a href="download.html">Download</a>
+        </li>
+              
+    <li class="none">
+          <a href="release_notes.html">Release Notes</a>
+        </li>
+          </ul>
+      <h5>Using CAS: HOW-TO</h5>
+    <ul>
+              
+    <li class="none">
+          <a href="tomcat_jndi.html">Config via JNDI</a>
+        </li>
+              
+    <li class="none">
+          <a href="dummy_trust.html">Dummy Trust</a>
+        </li>
+              
+    <li class="none">
+          <a href="multiple_hostname.html">Multiple Host Names</a>
+        </li>
+          </ul>
+      <h5>Project Collaboration</h5>
+    <ul>
+              
+    <li class="none">
+          <a href="google_group.html">Google Group</a>
+        </li>
+              
+    <li class="none">
+          <a href="source-repository.html">Source Code (SVN)</a>
+        </li>
+              
+    <li class="none">
+          <a href="team-list.html">Develoment Team</a>
+        </li>
+              
+    <li class="none">
+          <a href="license.html">License</a>
+        </li>
+          </ul>
+  <a href="http://maven.apache.org/" title="Built by Maven" id="poweredBy">
+              <img alt="Built by Maven" src="./images/logos/maven-feather.png"></img>
+            </a>
+    </div></div>
+    <div id="bodyColumn">
+      <div id="contentBox">
+        <div class="section"><h2>Extended CAS</h2><p>This is an extension of the CAS Client library originally based upon the <a href="http://www.ja-sig.org/wiki/display/CAS/Using+CASFilter">CAS Java client from JaSIG</a>. What differentiates this project from the originial CAS Java client is that its adds the ability to configure the CASFilter from a JNDI resource as well as the ability to selectively disable some of the security enforcement related to certificate trust and server self-identification. </p><p><b>Note</b>: This project contains options that, when activated, can introduce certain known vulnerabilities into your system. When appropriate, we have taken as much effort to inform you of these vulnerabilities. If you need to add support for virtual hosts or enable blind trust, you should only do so only if you feel adequately informed of the security compromises you are making. Instead of preventing insecurity through the design of this client, this client gives you the opportunity to make informed compromises. If you are looking for a CAS client that enforces strict security by design, we encourage you to use the originial <a href="http://www.ja-sig.org/">CAS Client from JaSIG</a>.</p><div class="section"><h3><a href="tomcat_jndi.html">Ability to Configure CASFilter via JNDI</a></h3><p>The default CASFilter only allowed for configuration from servlet filter initialization parameters. This extension adds the ability to configure the extended filter from a JNDI location. This feature removes configuration from your web application and enables you to configure your container, not your application. <a href="tomcat_jndi.html">(more information...)</a></p></div><div class="section"><h3><a href="multiple_hostname.html">Adding Support for Multiple Server Names</a></h3><p>When CASfilter redirects a client to the CAS login page, it sends a server name or service url that the CAS server should redirect to upon successful authentication. The Extended CAS Filter allows you to specify multiple server names an application can pass on to the CAS server. The CASFilter reads the Host: header and checks it against the list of server names supplied. This feature introduces a vulnerability, but the developers of this component believe that this vulnerability is acceptable under certain conditions. <a href="multiple_hostname.html">(more information...)</a></p></div><div class="section"><h3><a href="dummy_trust.html">Configurable Trust for Programmatic SSL</a></h3><p>Extended CAS contains a configuration parameter <b>dummyTrust</b> that uses a DummyTrustManager and a DummyHostnameVerifier when contacting the CAS server. While not recommended in a production environment, the ability to disable strict SSL trust reduces some of the headache involved in getting the CASFilter to work with a self-signed certificate. This feature is most helpful when configuring a series of development machines that need to run local instances of CAS server with a self-signed certificate. <a href="dummy_trust">(more information...)</a></p></div><div class="section"><h3>Forcing the Service URL Scheme</h3><p>An extra parameter has been added to version 2.2 which allows you to force the scheme of a generated service URL. If you are letting CAS filter generate the service URL passed to CAS server from a request. It can sometimes be helpful to be able to force the service URL to be a certain scheme. This parameter was motivated by the following situation, when an application server running the CAS filter is being proxied be a load balancer that is handling SSL, there are times when the request may not appear to be secure (request.isSecure() returns false). If CAS filter is generating a service URL for CAS to return to after a successful validation, this URL will be &quot;http&quot;. Setting serviceScheme = 'https' will force the CAS filter to generate a secure service URL.</p></div></div><div class="section"><h2>Downloading Extended CAS Client</h2><p>This Extended CAS Client can be downloaded from the central ibiblio Maven2 repository or from the following links:</p><ul><li>30-Apr-06 - Version 2.2 of the Extended CAS Client (<a href="http://www.discursive.com/maven2/
+com/discursive/cas/extend/cas-extend-client-java/2.2/cas-extend-client-java-2.2.jar">download</a>) (<a href="release_notes.html">release notes</a>)</li><li>25-Feb-06 - Version 2.1.1 of the Extended CAS Client (<a href="http://www.discursive.com/maven2/
+com/discursive/cas/extend/cas-extend-client-java/2.1.1/cas-extend-client-java-2.1.1.jar">download</a>) (<a href="release_notes.html">release notes</a>)</li></ul></div>
+      </div>
+    </div>
+    <div class="clear">
+      <hr/>
+    </div>
+    <div id="footer">
+      <div class="xright">&#169;  
+          2006
+    
+      </div>
+      <div class="clear">
+        <hr/>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,135 @@
+
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <title>Configuring Extended CAS Filter to Trust Blindly</title>
+    <style type="text/css" media="all">
+      @import url("./css/maven-base.css");
+      @import url("./css/maven-theme.css");
+      @import url("./css/site.css");
+    </style>
+    <link rel="stylesheet" href="./css/print.css" type="text/css" media="print" />
+        <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+  </head>
+  <body class="composite">
+    <div id="banner">
+                          <a href="http://www.discursive.com/projects/cas-extend/" id="bannerLeft">
+    
+                                    <img src="http://www.discursive.com/projects/cas-extend/images/cas-banner.png" alt="" />
+    
+            </a>
+                    <div class="clear">
+        <hr/>
+      </div>
+    </div>
+    <div id="breadcrumbs">
+      <div class="xleft">Last Published: Sun Apr 30 13:41:08 CDT 2006</div>
+      <div class="xright">  </div>
+      <div class="clear">
+        <hr/>
+      </div>
+    </div>
+    <div id="leftColumn"><div id="navcolumn">      <h5>Extended CAS</h5>
+    <ul>
+              
+    <li class="none">
+          <a href="index.html">Introduction</a>
+        </li>
+              
+    <li class="none">
+          <a href="configure.html">Configuration</a>
+        </li>
+              
+    <li class="none">
+          <a href="download.html">Download</a>
+        </li>
+              
+    <li class="none">
+          <a href="release_notes.html">Release Notes</a>
+        </li>
+          </ul>
+      <h5>Using CAS: HOW-TO</h5>
+    <ul>
+              
+    <li class="none">
+          <a href="tomcat_jndi.html">Config via JNDI</a>
+        </li>
+              
+    <li class="none">
+          <strong><a href="dummy_trust.html">Dummy Trust</a></strong>
+        </li>
+              
+    <li class="none">
+          <a href="multiple_hostname.html">Multiple Host Names</a>
+        </li>
+          </ul>
+      <h5>Project Collaboration</h5>
+    <ul>
+              
+    <li class="none">
+          <a href="google_group.html">Google Group</a>
+        </li>
+              
+    <li class="none">
+          <a href="source-repository.html">Source Code (SVN)</a>
+        </li>
+              
+    <li class="none">
+          <a href="team-list.html">Develoment Team</a>
+        </li>
+              
+    <li class="none">
+          <a href="license.html">License</a>
+        </li>
+          </ul>
+  <a href="http://maven.apache.org/" title="Built by Maven" id="poweredBy">
+              <img alt="Built by Maven" src="./images/logos/maven-feather.png"></img>
+            </a>
+    </div></div>
+    <div id="bodyColumn">
+      <div id="contentBox">
+        <div class="section"><h2>Blind Trust and the Extended CAS Filter</h2><p>This document outlines the Extended CAS Filter's option to enable blind trust through the use of a DummyTrustManager and DummyHostnameVerifier. While, the use of this configuration parameter is not recommended for a production setting, it is a feature that can come in handy when you are developing against a CAS Server that is using a self-signed certificate.</p><div class="section"><h3>What is the Issue? Why Blind Trust?</h3><p>Getting the CASFilter to trust a self-signed certificate during the programmatic SSL involved in validating a CAS ticket is an ordeal. This change to the CAS Filter simply allows you to use a DummyTrustManager and a DummyHostnameVerifier, and is designed to ease the burden on developers in a development environment.</p></div><div class="section"><h3>How do I Trustly Blindly?</h3><p>First, make sure that this is really something you want to do. If you are doing this in a development environment, continue to the next section. If you are trying to do this in a production environment, you should know that enabling dummy trust is going to expose your system to a vulnerability. If you enable dummy trust, and someone compromises your web application or your CAS server, they could conceivably hijack you application's authentication or create a dummy login page to capture your credentials. <b>Enabling this in a production environment is strongly discouraged</b>.</p><div class="section"><h4>JNDI Configuration</h4><p>If you are configuring the CASFilter via JNDI, just make sure that the dummyTrust property of CASConfig is set to true. The following Resource element is valid if you are configuring CASConfig as a GlobalNamingResource:</p><div class="source"><pre>&lt;Resource name=&quot;security/CASConfig&quot;
+          type=&quot;com.discursive.cas.extend.client.CASConfig&quot;
+          factory=&quot;org.apache.naming.factory.BeanFactory&quot;
+          casLogin=&quot;https://www.blahblah.com/cas/login&quot;
+          casValidate=&quot;https://www.blahblah.com/cas/serviceValidate&quot;
+          dummyTrust=&quot;true&quot;
+          serverName=&quot;www.blahblah.com&quot;/&gt; </pre></div></div><div class="section"><h4>Filter Parameters</h4><p>To configure blind trust through a filter initialization parameter add the following init-param to your web.xml</p><div class="source"><pre>&lt;filter&gt;
+  &lt;filter-name&gt;CAS Filter&lt;/filter-name&gt;
+  &lt;filter-class&gt;
+    com.discursive.cas.extend.client.filter.CASFilter
+  &lt;/filter-class&gt;
+  // ...other init params...
+  &lt;init-param&gt;
+    &lt;param-name&gt;
+      com.discursive.cas.extend.client.dummy.trust
+    &lt;/param-name&gt;
+    &lt;param-value&gt;true&lt;/param-value&gt;
+  &lt;/init-param&gt;
+&lt;/filter&gt;</pre></div></div></div><div class="section"><h3>What does this setting do?</h3><p>It will turn off any and all validation of certificates during server-server communications. This comes into play when your client web application needs to validate a ticket, and that's where this setting becomes a security risk. Your application needs to know that the CAS Server it is validating a ticket against is authentic, turning on blind trust opens your application to an impostor attack. The code to add blind trust is in SecureURL.java:</p><div class="source"><pre>URLConnection uc = u.openConnection();
+if( dummy ) {
+  HttpsURLConnection secUc = (HttpsURLConnection) uc;
+  secUc.setSSLSocketFactory(new DummySSLSocketFactory());
+  secUc.setHostnameVerifier(new DummyHostnameVerifier());
+}</pre></div></div><div class="section"><h3>Isn't this a bad idea?</h3><p>Circumventing the trust mechanism provided by certificates may seem like a bad idea at first, but spend a few hours <i>banging your head against the confusion that is JSSE</i>, and you'll be looking for an easier alternative. This document provides one, but with a caveat, don't use the <i>dummyTrust</i> option in anything resembling a production environment unless you are very certain of what you are doing. This option was created primarily for development environments where having an ultra-secure server-to-server relationship between a client web application and the CAS authentication server is a secondary concern. Again, <b>for emphasis</b>, this mechanism is here for the developer. Don't use this in a production environment. If you insist on using the <b>dummyTrust</b> option in production, you should only do so knowing that you are compromising security.</p><div class="source"><pre>  Contributors:  Tim O'Brien (3/06)</pre></div></div></div>
+      </div>
+    </div>
+    <div class="clear">
+      <hr/>
+    </div>
+    <div id="footer">
+      <div class="xright">&#169;  
+          2006
+    
+      </div>
+      <div class="clear">
+        <hr/>
+      </div>
+    </div>
+  </body>
+</html>

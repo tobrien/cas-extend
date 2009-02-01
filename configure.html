@@ -1,0 +1,124 @@
+
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <title>Configuring the CAS Client Filter</title>
+    <style type="text/css" media="all">
+      @import url("./css/maven-base.css");
+      @import url("./css/maven-theme.css");
+      @import url("./css/site.css");
+    </style>
+    <link rel="stylesheet" href="./css/print.css" type="text/css" media="print" />
+        <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+  </head>
+  <body class="composite">
+    <div id="banner">
+                          <a href="http://www.discursive.com/projects/cas-extend/" id="bannerLeft">
+    
+                                    <img src="http://www.discursive.com/projects/cas-extend/images/cas-banner.png" alt="" />
+    
+            </a>
+                    <div class="clear">
+        <hr/>
+      </div>
+    </div>
+    <div id="breadcrumbs">
+      <div class="xleft">Last Published: Sun Apr 30 13:41:08 CDT 2006</div>
+      <div class="xright">  </div>
+      <div class="clear">
+        <hr/>
+      </div>
+    </div>
+    <div id="leftColumn"><div id="navcolumn">      <h5>Extended CAS</h5>
+    <ul>
+              
+    <li class="none">
+          <a href="index.html">Introduction</a>
+        </li>
+              
+    <li class="none">
+          <strong><a href="configure.html">Configuration</a></strong>
+        </li>
+              
+    <li class="none">
+          <a href="download.html">Download</a>
+        </li>
+              
+    <li class="none">
+          <a href="release_notes.html">Release Notes</a>
+        </li>
+          </ul>
+      <h5>Using CAS: HOW-TO</h5>
+    <ul>
+              
+    <li class="none">
+          <a href="tomcat_jndi.html">Config via JNDI</a>
+        </li>
+              
+    <li class="none">
+          <a href="dummy_trust.html">Dummy Trust</a>
+        </li>
+              
+    <li class="none">
+          <a href="multiple_hostname.html">Multiple Host Names</a>
+        </li>
+          </ul>
+      <h5>Project Collaboration</h5>
+    <ul>
+              
+    <li class="none">
+          <a href="google_group.html">Google Group</a>
+        </li>
+              
+    <li class="none">
+          <a href="source-repository.html">Source Code (SVN)</a>
+        </li>
+              
+    <li class="none">
+          <a href="team-list.html">Develoment Team</a>
+        </li>
+              
+    <li class="none">
+          <a href="license.html">License</a>
+        </li>
+          </ul>
+  <a href="http://maven.apache.org/" title="Built by Maven" id="poweredBy">
+              <img alt="Built by Maven" src="./images/logos/maven-feather.png"></img>
+            </a>
+    </div></div>
+    <div id="bodyColumn">
+      <div id="contentBox">
+        <div class="section"><h2>Configuring the CAS Client Filter</h2><div class="section"><h3>JNDI Configuration</h3><p>Instructions for configuring the CASFilter via JNDI can be found on the <a href="tomcat_jndi.html">JNDI Configuration HOW-TO</a>. Configuring via JNDI is essentially populating the properties of an instance of CASConfig. These properties are as follows:</p><table class="bodyTable"><tbody><tr class="a"><td align="left">casLogin</td><td align="left">Secure URL whereat CAS offers its login service.</td></tr><tr class="b"><td align="left">casValidate</td><td align="left">Secure URL whereat CAS offers its CAS 2.0 validate service</td></tr><tr class="a"><td align="left">casServiceUrl</td><td align="left">Filtered service URL for use as service parameter to login and validate</td></tr><tr class="b"><td align="left">casServerName</td><td align="left">Name of server, for use in assembling service URL for use as service parameter to login and validate.</td></tr><tr class="a"><td align="left">multiServerName</td><td align="left">See <a href="mutliple_hostname.html">multiple hostnames</a></td></tr><tr class="b"><td align="left">casProxyCallbackUrl</td><td align="left">Secure URL whereto this filter should ask CAS to send Proxy Granting Tickets.</td></tr><tr class="a"><td align="left">casAuthorizedProxy</td><td align="left"></td></tr><tr class="b"><td align="left">casRenew</td><td align="left">true if renew parameter should be set on login and validate</td></tr><tr class="a"><td align="left">wrapRequest</td><td align="left">true if this filter should wrap requests to expose authenticated user as getRemoteUser();</td></tr><tr class="b"><td align="left">casGateway</td><td align="left">true if this filter should set gateway=true on login redirect</td></tr><tr class="a"><td align="left">dummyTrust</td><td align="left">See <a href="dummy_trust.html">dummy trust</a></td></tr><tr class="b"><td align="left">serviceScheme</td><td align="left">If serviceScheme is set, the filter will use this scheme in the URL is computes for the service URL. In other words, if the filter is computing a serviceURL from a non-secure request &quot;http&quot;, and the serviceScheme parameter is set to &quot;https&quot;, the serviceUrl will start with &quot;https&quot;. This parameter is present for situations where an application server is being proxied by a load balancer. If the load balancer is taking care of all SSL, and the internal request isn't secure, you need to be able to force the serviceUrl to be secure such that the CAS server will redirect the browser back to a secure URL.</td></tr></tbody></table><p>Since this client is derivative of the original CAS Client, you may find more configuration information <a href="http://www.ja-sig.org/wiki/display/CAS/Using+CASFilter">at the originial JaSIG CAS Client Wiki</a>.</p></div><div class="section"><h3>Filter Parameters</h3><p>The Extended CAS filter accepts the same parameters as <a href="http://www.ja-sig.org/wiki/display/CAS/Using+CASFilter"> the originial CAS Filter</a> with a different domain prefix. When the Yale CAS Filter init parameters are under edu.yale.its.tp.cas.client.filter, the Extended CAS filter's init parameters are under com.discursive.cas.extend.client The following table lists the possible configuration parameters, assume that every parameter begins with com.discursive.cas.extend.client.</p><table class="bodyTable"><tbody><tr class="a"><td align="left">.config.jndi</td><td align="left">If this property is set, the CASFilter will attempt to load an instance of CASConfig from the name specified. Example: &quot;security/CASConfig&quot;. For more information, <a href="tomcat_jndi.html">see jndi configuration</a>. If this property is set, it overrides all other properties and the CASFilter is configured from JNDI.</td></tr><tr class="b"><td align="left">.filter.loginUrl</td><td align="left">The https: of the CAS Login servlet</td></tr><tr class="a"><td align="left">.filter.validateUrl</td><td align="left">The https: of the CAS Validate servlet</td></tr><tr class="b"><td align="left">.filter.serviceUrl</td><td align="left">The address for the service the CAS filter is filtering. This parameter is passed to CAS server on authentication and the browser is redirected to this URL after a successful login.</td></tr><tr class="a"><td align="left">.filter.serverName</td><td align="left">The name of the server (and port number) of the service you are protected. When this is specified, the CAS Filter constructs the service URL from the request and uses this parameter as the server name. Examples: &quot;localhost&quot;, &quot;www.discursive.com&quot;, &quot;www.discursive.com:8080&quot;. This parameter is a security risk</td></tr><tr class="b"><td align="left">.filter.multipleServerName</td><td align="left">A space delimited list of servers this CAS Filter can represent to a CAS Server. When this property is set, the CAS Filter relies upon the Host header if it matches one of the hosts specified in this property. <a href="multiple_hostname.html">See multiple host names for more info</a>. Example: &quot;localhost www.discursive.com www.discursive.com:8080&quot;</td></tr><tr class="a"><td align="left">.filter.renew</td><td align="left">Set to true if the renew parameter should be sent with a login or validate. Exclusive with gateway</td></tr><tr class="b"><td align="left">.filter.authorizedProxy</td><td align="left">a whitespace delimited list of services (ProxyTicketReceptors) authorized to proxy authentication to the service filtered by this Filter.</td></tr><tr class="a"><td align="left">.filter.proxyCallbackUrl</td><td align="left">the https: URL to which CAS should send Proxy Granting Tickets when this filter validates tickets.</td></tr><tr class="b"><td align="left">.filter.wrapRequest</td><td align="left">whether this filter should wrap requests to expose the authenticated username.</td></tr><tr class="a"><td align="left">.filter.gateway</td><td align="left">the value the Filter should send for the gateway parameter on the CAS login request.</td></tr><tr class="b"><td align="left">.dummy.trust</td><td align="left">See <a href="dummy_trust.html">dummy trust</a>. Note that this parameter is a security risk.</td></tr><tr class="a"><td align="left">.filter.serviceScheme</td><td align="left">If serviceScheme is set, the filter will use this scheme in the URL is computes for the service URL. In other words, if the filter is computing a serviceURL from a non-secure request &quot;http&quot;, and the serviceScheme parameter is set to &quot;https&quot;, the serviceUrl will start with &quot;https&quot;. This parameter is present for situations where an application server is being proxied by a load balancer. If the load balancer is taking care of all SSL, and the internal request isn't secure, you need to be able to force the serviceUrl to be secure such that the CAS server will redirect the browser back to a secure URL.</td></tr></tbody></table><p>Here is an example of a Filter configuration that sets the dummy trust parameter. For a complete example, see <a href="http://www.ja-sig.org/wiki/display/CAS/Using+CASFilter">the originial CAS documentation</a> and change the parameter prefix to com.discursive.cas.extend.client.</p><div class="source"><pre>&lt;filter&gt;
+  &lt;filter-name&gt;CAS Filter&lt;/filter-name&gt;
+  &lt;filter-class&gt;
+    com.discursive.cas.extend.client.filter.CASFilter
+  &lt;/filter-class&gt;
+  // ...other init params...
+  &lt;init-param&gt;
+    &lt;param-name&gt;
+      com.discursive.cas.extend.client.filter.multiServerName
+    &lt;/param-name&gt;
+    &lt;param-value&gt;www.discursive.com java.discursive.com&lt;/param-value&gt;
+  &lt;/init-param&gt;
+&lt;/filter&gt;</pre></div><div class="source"><pre>  Contributors:  Tim O'Brien (3/06)</pre></div></div></div>
+      </div>
+    </div>
+    <div class="clear">
+      <hr/>
+    </div>
+    <div id="footer">
+      <div class="xright">&#169;  
+          2006
+    
+      </div>
+      <div class="clear">
+        <hr/>
+      </div>
+    </div>
+  </body>
+</html>
